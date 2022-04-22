@@ -23,7 +23,6 @@ $archivos->CrearDirectorio($nombreCarpetaArchivos);
 $archivos->CrearDirectorio($nombreCarpetaArchivos.'Fotos/');
 $nombreFotoPerfil = $multiToolAux->GenerarNombreArchivoFotoPerfil($nombre,$apellidos);
 $certificado = $nombreCarpetaArchivos.'Fotos/' . $certificado;
-$certificado = $nombreCarpetaArchivos.'Fotos/' . $historial;
-
+$historial = $nombreCarpetaArchivos.'Fotos/' . $historial;
 echo $consultas->insertarDoctor($nombre,$apellidos,$edad,$email,$pass,$cedula,$especialidad,$estudios,$historial,$certificado,$nombreFotoPerfil);
 ?>

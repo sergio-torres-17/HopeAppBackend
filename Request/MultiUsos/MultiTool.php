@@ -16,6 +16,14 @@ class MultiTool{
         $resultado = $resultado . $arrAux[0];
         return $resultado;
     }
+    public function generarNombreExpediente($nombre, $apellidos){
+        $resultado = 'Expediente_';
+        $arrAux =explode( ' ', $nombre);
+        $resultado = $resultado . $arrAux[0];
+        $arrAux = explode( ' ', $apellidos);
+        $resultado = $resultado . $arrAux[0];
+        return $resultado;
+    }
     
 }
 ?>
