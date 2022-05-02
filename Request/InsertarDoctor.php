@@ -1,7 +1,7 @@
 <?php
-include ('../multiusos/MultiTool.php');
-include ('../multiusos/Archivos.php');
-include ('../../Db/Consultas.php');
+include ('MultiTool.php');
+include ('Archivos.php');
+include ('Consultas.php');
 //Constantes
 $rutaBaseArchivos = $_SERVER['DOCUMENT_ROOT'] .'/hopeappbackend/archivos/';
 $multiToolAux = new MultiTool();

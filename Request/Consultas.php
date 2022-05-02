@@ -1,11 +1,14 @@
 <?php
 header('Content-Type: text/html; charset=UTF-8');
-include 'Conexion.php';
+require 'Conexion.php';
 class Consultas{
     private $conexion;
     public function __construct()
     {
         $this->conexion= new Conexion();
+    }
+    private function cerrarConexion(){
+        
     }
     public function LoginDoctores($correoCedula, $pass){
         $passEcr = sha1($pass);
@@ -75,6 +78,7 @@ class Consultas{
             $result = json_encode($lector);
             return $result;
         }
+       
         return "0";
     }
     public function traerInfoPosLoginMedico($emailCedula){
@@ -94,23 +98,27 @@ class Consultas{
         if($lector = $cmd->fetchAll()){
             $result =  json_encode($lector);
             return $result;
-        }
+        } 
         return "0";
     }
     public function verPacientesSinTutela(){
-        $cmd = $this->conexion->GetConnection()->prepare("SELECT Nombre,apellidos,edad,etapa,tipo,foto_perfil FROM vw_vista_pacientes_movil_sin_tutela;");
+        $connection = $this->conexion->GetConnection();
+        $cmd = $connection->prepare("SELECT Nombre,apellidos,edad,etapa,tipo,foto_perfil FROM vw_vista_pacientes_movil_sin_tutela;");
         $cmd->execute();
-        if($lector = $cmd->fetchAll()){
+        $lector = $cmd->fetchAll();
+        if($lector){
             $result = json_encode($lector);
+            $connection = null;
             return $result;
         }
+        $connection = null;
         return "0";
     }
 
     /*Consultas pacientes*/
     public function insertarPaciente($nombre, $apellidos, $edad,$email,$pass,$tipoCancer,$etapa, $rutaExpediente,$rutaFoto){
         $ejecutante = 1;
-        $cmd = $this->conexion->GetConnection()->prepare("CALL sp_Insertar_Paciente(:nombre, :apellidos , :edad , :email , :pass , :tipo_cancer , :etapa , :ruta,:rutaExp , :idEjecutante);");
+        $cmd = $this->conexion->GetConnection()->prepare("CALL sp_Insertar_Paciente(:nombre, :apellidos , :edad , :email , :pass , :tipo_cancer , :etapa ,:rutaExp , :ruta,:idEjecutante)");
         $cmd->bindParam(":nombre",$nombre);
         $cmd->bindParam(":apellidos",$apellidos);
         $cmd->bindParam(":edad",$edad);
@@ -122,7 +130,8 @@ class Consultas{
         $cmd->bindParam(":rutaExp",$rutaExpediente);
         $cmd->bindParam(":idEjecutante",$ejecutante);
         $cmd->execute();
-        if($lector = $cmd->fetchAll()){
+        $lector = $cmd->fetchAll();
+        if($lector){
             $result = json_encode($lector);
             return $result;
         }

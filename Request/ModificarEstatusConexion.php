@@ -1,5 +1,5 @@
 <?php
-include ('../../Db/Consultas.php');
+include ('Consultas.php');
 $cmd = new Consultas();
 $estatus = $_GET['stat'];
 $idDoctor = $_GET['IdDoctor'];;

@@ -1,5 +1,5 @@
 <?php
-include ('../../Db/Consultas.php');
+include ('Consultas.php');
 $obj = new Consultas();
 $nombre = $_POST['nombre'];
 $apellidos = $_POST['apellidos'];

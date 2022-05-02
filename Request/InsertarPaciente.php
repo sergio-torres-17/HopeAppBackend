@@ -1,17 +1,20 @@
 <?php
-include ('../multiusos/MultiTool.php');
-include ('../multiusos/Archivos.php');
-include ('../../Db/Consultas.php');
+include ('MultiTool.php');
+include ('Archivos.php');
+include ('Consultas.php');
 
-$nombres = $_GET['nombres'];
+$nombre= $_GET['nombres'];
 $apellidos = $_GET['apellidos'];
 $edad = $_GET['edad'];
 $email = $_GET['email'];
 $pass = $_GET['pass'];
 $tipo_cancer = $_GET['tipocancer'];
 $etapa = $_GET['etapa'];
-$fotoPerfilBin = $_GET['fotoPerfil'];
+//$fotoPerfilBin = $_GET['fotoPerfil'];
 //$fotoExpedienteBin = $_GET['fotoExpediente'];
+$multiToolAux = new MultiTool();
+$archivos = new ControArchivos();
+$rutaBaseArchivos = $_SERVER['DOCUMENT_ROOT'].'/img/';
 
 $nombreCarpetaArchivos = $rutaBaseArchivos .  $multiToolAux->GenerarNombreCarpetaUsuario($nombre, $apellidos). '/';
 $archivos->CrearDirectorio($nombreCarpetaArchivos);
@@ -21,8 +24,8 @@ $nombreExpediente = $multiToolAux->generarNombreExpediente($nombre,$apellidos);
 $rutaFotoPerfil = $nombreCarpetaArchivos.'Fotos/' . $nombreFotoPerfil;
 $rutaExpediente = $nombreCarpetaArchivos.'Fotos/' . $nombreExpediente;
 //Guardado de imagenes
-file_put_contents($rutaFotoPerfil, base64_decode($fotoPerfilBin));//Guardado de imagen de perfil
-$archivoByte = file_get_contents($rutaFotoPerfil);
+//file_put_contents($rutaFotoPerfil, base64_decode($fotoPerfilBin));//Guardado de imagen de perfil
+//$archivoByte = file_get_contents($rutaFotoPerfil);
 $cmd = new Consultas();
 $cmd->insertarPaciente($nombre,$apellidos,$edad,$email,$pass,$tipo_cancer,$etapa, $rutaExpediente,$rutaFotoPerfil);
 ?>
