@@ -3,7 +3,7 @@ include ('MultiTool.php');
 include ('Archivos.php');
 include ('Consultas.php');
 //Constantes
-$rutaBaseArchivos = $_SERVER['DOCUMENT_ROOT'] .'/HopeAppBackend/Request/archivos/';
+$rutaBaseArchivos = getcwd() . '/Archivos/';
 $multiToolAux = new MultiTool();
 $archivos = new ControArchivos();
 $consultas= new Consultas();
@@ -27,6 +27,6 @@ $certificado = $nombreCarpetaArchivos.'Fotos/' . $certificado;
 $historial = $nombreCarpetaArchivos.'Fotos/' . $historial;
 //Guardado de imagenes
 file_put_contents($nombreFotoPerfil, base64_decode($imgPerfil));
-
+    
 echo $consultas->insertarDoctor($nombre,$apellidos,$edad,$email,$pass,$cedula,$especialidad,$estudios,$historial,$certificado,$nombreFotoPerfil);
 ?>

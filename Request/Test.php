@@ -1,3 +1,5 @@
 <?php
-echo sha1('12345')
+$dato = $_POST['parametro'];
+echo $dato;
+
 ?>

@@ -1,18 +1,31 @@
 <?php
 header('Content-Type: text/html; charset=UTF-8');
+mb_internal_encoding('UTF-8');
+// Esto le dice a PHP que generaremos cadenas UTF-8
+mb_http_output('UTF-8');
+
+
+
+
 require 'Conexion.php';
+
+
 class Consultas{
     private $conexion;
+
+
     public function __construct()
     {
         $this->conexion= new Conexion();
     }
+
     private function cerrarConexion(){
         
     }
+    
     public function LoginDoctores($correoCedula, $pass){
         $passEcr = sha1($pass);
-        $cmd= $this->conexion->GetConnection()->prepare("CALL sp_Login_Doctores(:usr,:pwd)");
+        $cmd = $this->conexion->GetConnection()->prepare("CALL sp_Login_Doctores(:usr,:pwd)");
         $cmd->bindParam(':usr', $correoCedula,PDO::PARAM_STR);
         $cmd->bindParam(':pwd', $passEcr,PDO::PARAM_STR);
         $cmd->execute();
@@ -22,6 +35,7 @@ class Consultas{
         }
         return "0";
     }
+
     public function modificarEstatusConexionDoctor($idDoctor,$estatus,$idUsuario){
         $cmd = $this->conexion->GetConnection()->prepare("call sp_Modificar_Status_Doctor_Api(:idDoctor,:estatus,:idUsuario)");
         $cmd->bindParam(":idDoctor",$idDoctor);
@@ -34,6 +48,7 @@ class Consultas{
         }
         return "0";
     }
+
     public function logOutDoctores($emailCedula){
         $cmd = $this->conexion->GetConnection()->prepare("CALL sp_Log_Out_Doctores(:emailOCedula)");
         $cmd->bindParam(':emailOCedula', $emailCedula,PDO::PARAM_STR);
@@ -45,7 +60,7 @@ class Consultas{
         return "0";
     }
     public function validacionExistneciaDeUsuario($nombre,$apellidos, $email){
-        $cmd = $this->conexion->GetConnection()->prepare("select fn_verificar_si_existe_usuario(:nombre, :apellidos, :correo) 'Existe'");
+        $cmd = $this->conexion->GetConnection()->prepare("select fn_verificar_si_existe_usuario(:nombre, :apellidos, :correo) as 'respuesta' ");
         $cmd->bindParam(':nombre',$nombre);
         $cmd->bindParam(':apellidos',$apellidos);
         $cmd->bindParam(':correo',$email);
@@ -86,6 +101,7 @@ class Consultas{
         $cmd->bindParam(":email", $emailCedula);
         $cmd->execute();
         if($lector = $cmd->fetchAll()){
+            
             $result = json_encode($lector);
             return $result;
         }
@@ -114,16 +130,30 @@ class Consultas{
         $connection = null;
         return "0";
     }
+    public function InsertarTutelaSobrePaciente($nombreDoctor,$nombrePaciente,$fechaHora){
+        $cmd = $this->conexion->GetConnection()->prepare('CALL sp_Insertar_Tutela(:nombre_doctor, :nombre_paciente , :fechaHora,fn_Buscar_Id_Usuario_Por_Nombre(:nombre_doctor))');
+        $cmd->bindParam(':nombre_doctor',$nombreDoctor);
+        $cmd->bindParam(':nombre_paciente',$nombrePaciente);
+        $cmd->bindParam(':fechaHora',$fechaHora);
+        $cmd->execute();
+        $lector = $cmd->fetchAll();
+        if($lector){
+            $result = json_encode($lector);
+            return $result;
+        }
+        return "0";
+    }
 
     /*Consultas pacientes*/
     public function insertarPaciente($nombre, $apellidos, $edad,$email,$pass,$tipoCancer,$etapa, $rutaExpediente,$rutaFoto){
         $ejecutante = 1;
-        $cmd = $this->conexion->GetConnection()->prepare("CALL sp_Insertar_Paciente(:nombre, :apellidos , :edad , :email , :pass , :tipo_cancer , :etapa ,:rutaExp , :ruta,:idEjecutante)");
+        $pwdEncrypted = sha1($pass);
+        $cmd = $this->conexion->GetConnection()->prepare("CALL sp_Insertar_Paciente(:nombre, :apellidos , :edad , :email , :pass , :tipo_cancer , :etapa ,:rutaExp , :ruta, :idEjecutante)");
         $cmd->bindParam(":nombre",$nombre);
         $cmd->bindParam(":apellidos",$apellidos);
         $cmd->bindParam(":edad",$edad);
         $cmd->bindParam(":email",$email);
-        $cmd->bindParam(":pass",$pass);
+        $cmd->bindParam(":pass",$pwdEncrypted);
         $cmd->bindParam(":tipo_cancer",$tipoCancer);
         $cmd->bindParam(":etapa",$etapa);
         $cmd->bindParam(":ruta",$rutaFoto);
@@ -134,6 +164,19 @@ class Consultas{
         if($lector){
             $result = json_encode($lector);
             return $result;
+        }
+        return "0";
+    }
+    public function LoginPacientes($usr, $pass)
+    {
+        $passEcrypted = sha1($pass);
+        $cmd = $this->conexion->GetConnection()->prepare("CALL sp_Login_Pacientes(:usr, :pwd)");
+        $cmd->bindParam(":usr",$usr);
+        $cmd->bindParam(":pwd",$passEcrypted);
+        $cmd->execute();
+        if($lector = $cmd->fetchAll()){
+            $resultado = json_encode($lector);
+            return $resultado;
         }
         return "0";
     }
@@ -178,6 +221,16 @@ class Consultas{
         }
         return "0";
     }
+    public function traerInfoPosLoginPaciente($email){
+        $cmd = $this->conexion->GetConnection()->prepare("CALL sp_Traer_Info_PosLogin_Pacientes(:email)");
+        $cmd->bindParam(":email", $email);
+        $cmd->execute();
+        if($lector = $cmd->fetchAll()){
+            $result = json_encode($lector);
+            return $result;
+        }
+        return "0";
+    }
     public function traerTiposCancer()
     {
         $cmd = $this->conexion->GetConnection()->prepare("select nombre_tipo 'tipo' from tipos_cancer");
@@ -199,6 +252,34 @@ class Consultas{
         }
         return "0";
     }
+    public function traerSintomasRegistrados(){
+        $cmd = $this->conexion->GetConnection()->prepare("select descripcion from sintomas");
+        $cmd->execute();
+        if($lector = $cmd->fetchAll()){
+            $result = json_encode($lector);
+            return $result;
+        }
+        return "0";
+    }
+    public function traerIntensidadSintomas(){
+        $cmd = $this->conexion->GetConnection()->prepare("select descripcion from intensidad_sintomas");
+        $cmd->execute();
+        if($lector = $cmd->fetchAll()){
+            $result = json_encode($lector);
+            return $result;
+        }
+        return "0";
+    }
+    public function traerInfoPacienteDetallada($id_usuario){
+        $cmd = $this->conexion->GetConnection()->prepare("call sp_Info_Usuario_detalla_por_Id(:id_usuario)");
+        $cmd->bindParam(":id_usuario", $id_usuario);
+        $cmd->execute();
+        if($lector = $cmd->fetchAll()){
+            $result = json_encode($lector);
+            return $result;
+        }
+        return "0";
+    }
 
     /*************************Genericos************************* */
     public function buscarTipoUsuarios($correo){
@@ -208,6 +289,51 @@ class Consultas{
         if($lector = $cmd->fetchAll()){
             $result = json_encode($lector);
             return $result;
+        }
+        return "0";
+    }
+    public function verTipoUsuario($usuario){
+        $cmd = $this->conexion->GetConnection()->prepare("select `fn_buscar_Tipo_Usuario`(:usr) 'tipo_usuario'");
+        $cmd->bindParam(":usr", $usuario);
+        $cmd->execute();
+        if($lector=$cmd->fetchAll()){
+            $dev = json_encode($lector);
+            return $dev;
+        }
+        return "0";
+    }
+    public function modificarInfo($nombre,$apellidos,$edad,$foto){
+        $cmd = $this->conexion->GetConnection()->prepare("CALL sp_ModificarInfo(:nombre,:apellidos,:edad,:foto)");
+        $cmd->bindParam(":nombre",$nombre);
+        $cmd->bindParam(":apellidos",$apellidos);
+        $cmd->bindParam(":edad",$edad);
+        $cmd->bindParam(":foto",$foto);
+        $cmd->execute();
+        if($lector = $cmd->fetchAll()){
+            $dev = json_encode($lector);
+            return $dev;
+        }
+        return "0";
+    }
+    public function buscarIDDoctorACargo($idPaciente){
+        $cmd = $this->conexion->GetConnection()->prepare('select fn_Obtener_Nombre_Doctor_A_Cargo(:idPaciente) \'nombre_doctor\'');
+        $cmd->bindParam(':idPaciente',$idPaciente);
+        $cmd->execute();
+        $lector = $cmd->fetchAll();
+        if($lector){
+            $dev = json_encode($lector);
+            return $dev;
+        }
+        return "0";
+    }
+    public function traerInfoPacienteDetalladaPorNombre($nombrePaciente){
+        $cmd = $this->conexion->GetConnection()->prepare('call sp_Traer_Detalles_Info_Usuario(:nombrePaciente)');
+        $cmd->bindParam(':nombrePaciente',$nombrePaciente);
+        $cmd->execute();
+        $lector = $cmd->fetchAll();
+        if($lector){
+            $dev = json_encode($lector);
+            return $dev;
         }
         return "0";
     }

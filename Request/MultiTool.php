@@ -17,7 +17,7 @@ class MultiTool{
         return $resultado;
     }
     public function generarNombreExpediente($nombre, $apellidos){
-        $resultado = 'Expediente_';
+        $resultado = 'EX_';
         $arrAux =explode( ' ', $nombre);
         $resultado = $resultado . $arrAux[0];
         $arrAux = explode( ' ', $apellidos);
