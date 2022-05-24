@@ -24,6 +24,11 @@ class MultiTool{
         $resultado = $resultado . $arrAux[0];
         return $resultado;
     }
-    
+    public function formarArraysImagenesBin($rutaFoto, $nombreEtiqueta){
+        $arrayDev = array(
+            $nombreEtiqueta=>base64_encode(file_get_contents($rutaFoto))
+        );
+        return $arrayDev;
+    }
 }
 ?>

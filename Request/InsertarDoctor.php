@@ -27,6 +27,5 @@ $certificado = $nombreCarpetaArchivos.'Fotos/' . $certificado;
 $historial = $nombreCarpetaArchivos.'Fotos/' . $historial;
 //Guardado de imagenes
 file_put_contents($nombreFotoPerfil, base64_decode($imgPerfil));
-    
 echo $consultas->insertarDoctor($nombre,$apellidos,$edad,$email,$pass,$cedula,$especialidad,$estudios,$historial,$certificado,$nombreFotoPerfil);
 ?>

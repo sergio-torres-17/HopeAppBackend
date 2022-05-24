@@ -118,13 +118,20 @@ class Consultas{
         return "0";
     }
     public function verPacientesSinTutela(){
+        require 'MultiTool.php';
         $connection = $this->conexion->GetConnection();
         $cmd = $connection->prepare("SELECT Nombre,apellidos,edad,etapa,tipo,foto_perfil FROM vw_vista_pacientes_movil_sin_tutela;");
         $cmd->execute();
         $lector = $cmd->fetchAll();
+        $multiTool = new MultiTool();
         if($lector){
+
+            for ($i=0; $i < sizeof($lector); $i++) { 
+                $arrInicial = $lector[$i];
+                $arrImagen = $multiTool->formarArraysImagenesBin($arrInicial['foto_perfil'],'fotoBin');
+                $lector[$i] = array_merge($arrInicial, $arrImagen);
+            }
             $result = json_encode($lector);
-            $connection = null;
             return $result;
         }
         $connection = null;
